@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="description" content="X-DNS is a dns server">
+    <meta name="keywords" content="X-DNS,X-DNS Server,DNS,DNS Server,徐承恩">
+    <meta name="author" content="徐承恩">
+    <meta name="email" content="xuchengen@gmail.com">
+    <meta name="github" content="https://www.github.com/xuchengen">
+    <title>登录</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/lib/jquery-ui/jquery-ui.min.css">
+    <script src="/lib/jquery/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="/lib/jquery-ui/jquery-ui.min.js"></script>
+</head>
+<body>
+<div id="login-dialog" title="登录">
+    <form action="#">
+        <div class="form-group">
+            <input class="form-control" type="text" placeholder="用户名">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" placeholder="密码">
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-7">
+                    <input class="form-control" type="text" placeholder="验证码">
+                </div>
+                <div class="col-xs-5">
+                    <img src="/captcha" width="90" height="34"
+                         style="cursor: pointer;"
+                         onclick="this.src='/captcha?t=' + new Date().getTime()">
+                </div>
+            </div>
+        </div>
+        <button id="submit-button" type="button" class="ui-button ui-widget ui-corner-all btn-block">登录</button>
+    </form>
+</div>
+<script>
+    $(function () {
+        $("#login-dialog").dialog({
+            resizable: false,
+            draggable: false,
+            beforeClose: function () {
+                return false;
+            }
+        });
+
+        $("#submit-button").on("click", function () {
+            shake();
+        });
+    });
+
+    function shake() {
+        for (let i = 1; i <= 3; i++) {
+            $("#login-dialog").parent()
+                .animate({left: "-=20px"}, 50)
+                .animate({left: "+=40px"}, 100)
+                .animate({left: "-=20px"}, 50);
+        }
+    }
+</script>
+</body>
+</html>
