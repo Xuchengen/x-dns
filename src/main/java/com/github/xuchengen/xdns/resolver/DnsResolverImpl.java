@@ -1,6 +1,5 @@
 package com.github.xuchengen.xdns.resolver;
 
-import com.github.xuchengen.xdns.config.BootstrapFactory;
 import com.github.xuchengen.xdns.exception.DnsException;
 import com.github.xuchengen.xdns.handler.DnsResponseHandler;
 import com.github.xuchengen.xdns.result.DnsResult;
@@ -22,8 +21,11 @@ import java.util.concurrent.TimeUnit;
 @Service(value = "dnsResolver")
 public class DnsResolverImpl implements DnsResolver {
 
-    @Resource(name = "bootstrapFactory")
-    public BootstrapFactory bootstrapFactory;
+    @Resource(name = "dnsTcpClientBootStrap")
+    private Bootstrap dnsTcpClientBootstrap;
+
+    @Resource(name = "dnsUdpClientBootstrap")
+    private Bootstrap dnsUdpClientBootstrap;
 
     @Override
     public DnsResult resolveDomainByTcp(String dnsIp, String domainName,
@@ -36,30 +38,27 @@ public class DnsResolverImpl implements DnsResolver {
 
         short randomID = DnsResolver.getRandomId();
 
-        Bootstrap bootstrap = bootstrapFactory.getBootstrapTcp(requestType.getType());
-
         final Channel ch;
         try {
-            ch = bootstrap.connect(dnsIp, 53).sync().channel();
+            ch = dnsTcpClientBootstrap.connect(dnsIp, 53).sync().channel();
         } catch (Throwable cte) {
-            throw new DnsException(
-                    String.format("fail to connect dns server, %s", cte.getMessage()));
+            throw new DnsException(String.format("fail to connect dns server, %s", cte.getMessage()));
         }
 
         DnsQuery query = new DefaultDnsQuery(randomID, DnsOpCode.QUERY)
                 .setRecord(DnsSection.QUESTION, new DefaultDnsQuestion(domainName, requestType.getType()))
                 .setRecursionDesired(true);
-
+        ch.attr(DnsResponseHandler.DNS_RECORD_TYPE).set(requestType.getType());
+        ch.attr(DnsResponseHandler.DOMAIN_NAME).set(domainName);
         try {
-            ch.writeAndFlush(query).sync().addListener(
-                    future ->
-                    {
-                        if (!future.isSuccess())
-                            throw new DnsException("fail send query message");
-                        else if (future.isCancelled())
-                            throw new DnsException("operation cancelled");
-                    }
-            );
+            ch.writeAndFlush(query).sync().addListener(future ->
+            {
+                if (!future.isSuccess()) {
+                    throw new DnsException("fail send query message");
+                } else if (future.isCancelled()) {
+                    throw new DnsException("operation cancelled");
+                }
+            });
 
             boolean bSuccess = ch.closeFuture().await(dnsTimeout, TimeUnit.SECONDS);
 
@@ -72,9 +71,9 @@ public class DnsResolverImpl implements DnsResolver {
             throw new DnsException("fail to resolve record, interrupted exception");
         }
 
-        DnsResult result = ch.attr(DnsResponseHandler.RECORD_RESULT).get();
+        DnsResult result = ch.attr(DnsResponseHandler.RESULT).get();
         if (result.getRecords().isEmpty()) {
-            throw new DnsException(ch.attr(DnsResponseHandler.ERROR_MSG).get());
+            throw new DnsException(ch.attr(DnsResponseHandler.ERROR).get());
         }
 
         return result;
@@ -92,25 +91,24 @@ public class DnsResolverImpl implements DnsResolver {
         short randomID = DnsResolver.getRandomId();
 
         InetSocketAddress addr = new InetSocketAddress(dnsIp, 53);
-        Bootstrap bootstrap = bootstrapFactory.getBootstrapUdp(requestType.getType());
 
         final Channel ch;
         try {
-            ch = bootstrap.bind(0).sync().channel();
+            ch = dnsUdpClientBootstrap.bind(0).sync().channel();
 
             DnsQuery query = new DatagramDnsQuery(null, addr, randomID)
                     .setRecord(DnsSection.QUESTION, new DefaultDnsQuestion(domainName, requestType.getType()))
                     .setRecursionDesired(true);
-
-            ch.writeAndFlush(query).sync().addListener(
-                    future ->
-                    {
-                        if (!future.isSuccess())
-                            throw new DnsException("fail send query message");
-                        else if (future.isCancelled())
-                            throw new DnsException("operation cancelled");
-                    }
-            );
+            ch.attr(DnsResponseHandler.DNS_RECORD_TYPE).set(requestType.getType());
+            ch.attr(DnsResponseHandler.DOMAIN_NAME).set(domainName);
+            ch.writeAndFlush(query).sync().addListener(future ->
+            {
+                if (!future.isSuccess()) {
+                    throw new DnsException("fail send query message");
+                } else if (future.isCancelled()) {
+                    throw new DnsException("operation cancelled");
+                }
+            });
 
             boolean bSuccess = ch.closeFuture().await(dnsTimeout, TimeUnit.SECONDS);
             if (!bSuccess) {
@@ -122,9 +120,9 @@ public class DnsResolverImpl implements DnsResolver {
             throw new DnsException("fail to resolve record, interrupted exception");
         }
 
-        DnsResult result = ch.attr(DnsResponseHandler.RECORD_RESULT).get();
+        DnsResult result = ch.attr(DnsResponseHandler.RESULT).get();
         if (result.getRecords().isEmpty()) {
-            throw new DnsException(ch.attr(DnsResponseHandler.ERROR_MSG).get());
+            throw new DnsException(ch.attr(DnsResponseHandler.ERROR).get());
         }
 
         return result;

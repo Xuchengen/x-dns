@@ -1,5 +1,6 @@
 package com.github.xuchengen.xdns.handler;
 
+import cn.hutool.core.util.StrUtil;
 import com.github.xuchengen.xdns.exception.DnsException;
 import com.github.xuchengen.xdns.result.DnsResult;
 import io.netty.buffer.ByteBufUtil;
@@ -8,6 +9,7 @@ import io.netty.handler.codec.dns.*;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutException;
 import io.netty.util.NetUtil;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,20 +21,10 @@ import java.util.List;
  * 邮箱：xuchengen@gmail.com<br>
  * 2022-04-15 14:40
  */
-public class DnsResponseHandlerA<T extends DnsResponse> extends DnsResponseHandler<T> {
+@Component(value = "dnsResponseProcessorA")
+public class DnsResponseProcessorA implements DnsResponseProcessor {
 
-    private String domainName;
-
-    public String getDomainName() {
-        return domainName;
-    }
-
-    public DnsResponseHandlerA(Class<? extends T> clazz) {
-        super(clazz, DnsRecordType.A);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void doError(ChannelHandlerContext ctx, Throwable cause) {
         String message;
         if (cause instanceof ReadTimeoutException) {
             message = "A handler read timed out";
@@ -41,19 +33,18 @@ public class DnsResponseHandlerA<T extends DnsResponse> extends DnsResponseHandl
         } else {
             message = String.format("A handler exception caught, %s", cause.getMessage());
         }
+        String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
         DnsResult dnsResult = new DnsResult(DnsResult.Type.A, domainName, Collections.emptyList());
-        ctx.channel().attr(RECORD_RESULT).set(dnsResult);
-        ctx.channel().attr(ERROR_MSG).set(message);
+        ctx.channel().attr(DnsResponseHandler.RESULT).set(dnsResult);
+        ctx.channel().attr(DnsResponseHandler.ERROR).set(message);
         ctx.close();
     }
 
-    @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, T dnsResponse) throws Exception {
+    public void doProcess(ChannelHandlerContext channelHandlerContext, DnsResponse dnsResponse) {
+        String domainName = StrUtil.EMPTY;
         if (dnsResponse.count(DnsSection.QUESTION) > 0) {
             DnsQuestion question = dnsResponse.recordAt(DnsSection.QUESTION, 0);
             domainName = question.name();
-        } else {
-            domainName = "";
         }
 
         int count = dnsResponse.count(DnsSection.ANSWER);
@@ -70,8 +61,8 @@ public class DnsResponseHandlerA<T extends DnsResponse> extends DnsResponseHandl
                 }
             }
 
-            DnsResult aResult = new DnsResult(DnsResult.Type.A, domainName, results);
-            channelHandlerContext.channel().attr(RECORD_RESULT).set(aResult);
+            DnsResult result = new DnsResult(DnsResult.Type.A, domainName, results);
+            channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(result);
         }
 
         channelHandlerContext.close();

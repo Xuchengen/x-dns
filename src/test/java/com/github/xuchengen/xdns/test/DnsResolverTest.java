@@ -71,7 +71,7 @@ public class DnsResolverTest extends BaseTest {
                 domainName = "kakao.com";
             }
 
-            DnsResult result = dnsResolver.resolveDomainByUdp("8.8.8.218", domainName, RequestType.REQUEST_A);
+            DnsResult result = dnsResolver.resolveDomainByUdp("223.5.5.5", domainName, RequestType.REQUEST_A);
             System.out.println(JSONUtil.toJsonStr(result.getRecords()));
         }
     }

@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class DnsResult {
 
-    public enum Type {MX, A, TXT, NS}
+    public enum Type {A, TXT, NS, MX}
 
     private final Type type;
 
