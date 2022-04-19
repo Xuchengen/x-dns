@@ -1,6 +1,6 @@
 package com.github.xuchengen.xdns.handler;
 
-import com.github.xuchengen.xdns.config.DnsResponseProcessorFactory;
+import com.github.xuchengen.xdns.handler.processor.DnsResponseProcessor;
 import com.github.xuchengen.xdns.result.DnsResult;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -28,23 +28,23 @@ public class DnsResponseHandler extends SimpleChannelInboundHandler<DnsResponse>
 
     public final static AttributeKey<String> DOMAIN_NAME = AttributeKey.valueOf("DOMAIN_NAME");
 
-    private final DnsResponseProcessorFactory factory;
+    private final DnsResponseProcessorContext dnsResponseProcessorContext;
 
-    public DnsResponseHandler(DnsResponseProcessorFactory factory) {
-        this.factory = factory;
+    public DnsResponseHandler(DnsResponseProcessorContext dnsResponseProcessorContext) {
+        this.dnsResponseProcessorContext = dnsResponseProcessorContext;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DnsResponse dnsResponse) {
         DnsRecordType type = ctx.channel().attr(DNS_RECORD_TYPE).get();
-        DnsResponseProcessor processor = factory.getProcessorByType(type);
+        DnsResponseProcessor processor = dnsResponseProcessorContext.get(type);
         processor.doProcess(ctx, dnsResponse);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable throwable) {
         DnsRecordType type = ctx.channel().attr(DNS_RECORD_TYPE).get();
-        DnsResponseProcessor processor = factory.getProcessorByType(type);
+        DnsResponseProcessor processor = dnsResponseProcessorContext.get(type);
         processor.doError(ctx, throwable);
     }
 }

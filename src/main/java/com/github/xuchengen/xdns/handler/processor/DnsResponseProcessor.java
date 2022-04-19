@@ -1,4 +1,4 @@
-package com.github.xuchengen.xdns.handler;
+package com.github.xuchengen.xdns.handler.processor;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.dns.DnsResponse;
