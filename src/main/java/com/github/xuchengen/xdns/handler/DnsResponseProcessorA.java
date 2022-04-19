@@ -34,7 +34,7 @@ public class DnsResponseProcessorA implements DnsResponseProcessor {
             message = String.format("A handler exception caught, %s", throwable.getMessage());
         }
         String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
-        DnsResult dnsResult = new DnsResult(DnsResult.Type.A, domainName, Collections.emptyList());
+        DnsResult dnsResult = new DnsResult(DnsRecordType.A, domainName, Collections.emptyList());
         ctx.channel().attr(DnsResponseHandler.RESULT).set(dnsResult);
         ctx.channel().attr(DnsResponseHandler.ERROR).set(message);
         ctx.close();
@@ -61,7 +61,7 @@ public class DnsResponseProcessorA implements DnsResponseProcessor {
                 }
             }
 
-            DnsResult result = new DnsResult(DnsResult.Type.A, domainName, results);
+            DnsResult result = new DnsResult(DnsRecordType.A, domainName, results);
             channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(result);
         }
 

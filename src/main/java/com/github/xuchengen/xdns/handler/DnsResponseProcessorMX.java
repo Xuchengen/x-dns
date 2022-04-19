@@ -32,7 +32,7 @@ public class DnsResponseProcessorMX implements DnsResponseProcessor {
             message = String.format("MX handler exception caught, %s", throwable.getMessage());
         }
         String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
-        DnsResult dnsResult = new DnsResult(DnsResult.Type.MX, domainName, Collections.emptyList());
+        DnsResult dnsResult = new DnsResult(DnsRecordType.MX, domainName, Collections.emptyList());
         ctx.channel().attr(DnsResponseHandler.RESULT).set(dnsResult);
         ctx.channel().attr(DnsResponseHandler.ERROR).set(message);
         ctx.close();
@@ -72,7 +72,7 @@ public class DnsResponseProcessorMX implements DnsResponseProcessor {
             }
 
             results = map.entrySet().stream().flatMap(entry -> entry.getValue().stream()).collect(Collectors.toList());
-            DnsResult mxResult = new DnsResult(DnsResult.Type.MX, domainName, results);
+            DnsResult mxResult = new DnsResult(DnsRecordType.MX, domainName, results);
             channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(mxResult);
         }
 

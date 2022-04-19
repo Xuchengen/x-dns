@@ -29,7 +29,7 @@ public class DnsResolverImpl implements DnsResolver {
 
     @Override
     public DnsResult resolveDomainByTcp(String dnsIp, String domainName,
-                                        RequestType requestType) throws DnsException {
+                                        DnsRecordType dnsRecordType) throws DnsException {
         if (dnsIp.isEmpty()) {
             dnsIp = "8.8.8.8";
         }
@@ -46,9 +46,9 @@ public class DnsResolverImpl implements DnsResolver {
         }
 
         DnsQuery query = new DefaultDnsQuery(randomID, DnsOpCode.QUERY)
-                .setRecord(DnsSection.QUESTION, new DefaultDnsQuestion(domainName, requestType.getType()))
+                .setRecord(DnsSection.QUESTION, new DefaultDnsQuestion(domainName, dnsRecordType))
                 .setRecursionDesired(true);
-        ch.attr(DnsResponseHandler.DNS_RECORD_TYPE).set(requestType.getType());
+        ch.attr(DnsResponseHandler.DNS_RECORD_TYPE).set(dnsRecordType);
         ch.attr(DnsResponseHandler.DOMAIN_NAME).set(domainName);
         try {
             ch.writeAndFlush(query).sync().addListener(future ->
@@ -81,7 +81,7 @@ public class DnsResolverImpl implements DnsResolver {
 
     @Override
     public DnsResult resolveDomainByUdp(String dnsIp, String domainName,
-                                        RequestType requestType) throws DnsException {
+                                        DnsRecordType dnsRecordType) throws DnsException {
         if (dnsIp.isEmpty()) {
             dnsIp = "8.8.8.8";
         }
@@ -97,9 +97,9 @@ public class DnsResolverImpl implements DnsResolver {
             ch = dnsUdpClientBootstrap.bind(0).sync().channel();
 
             DnsQuery query = new DatagramDnsQuery(null, addr, randomID)
-                    .setRecord(DnsSection.QUESTION, new DefaultDnsQuestion(domainName, requestType.getType()))
+                    .setRecord(DnsSection.QUESTION, new DefaultDnsQuestion(domainName, dnsRecordType))
                     .setRecursionDesired(true);
-            ch.attr(DnsResponseHandler.DNS_RECORD_TYPE).set(requestType.getType());
+            ch.attr(DnsResponseHandler.DNS_RECORD_TYPE).set(dnsRecordType);
             ch.attr(DnsResponseHandler.DOMAIN_NAME).set(domainName);
             ch.writeAndFlush(query).sync().addListener(future ->
             {

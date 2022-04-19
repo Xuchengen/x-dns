@@ -2,6 +2,7 @@ package com.github.xuchengen.xdns.resolver;
 
 import com.github.xuchengen.xdns.exception.DnsException;
 import com.github.xuchengen.xdns.result.DnsResult;
+import io.netty.handler.codec.dns.DnsRecordType;
 
 import java.util.Random;
 
@@ -18,8 +19,8 @@ public interface DnsResolver {
     }
 
     <T extends DnsResult> T resolveDomainByTcp(String dnsIp, String domainName,
-                                               RequestType requestType) throws DnsException;
+                                               DnsRecordType dnsRecordType) throws DnsException;
 
     <T extends DnsResult> T resolveDomainByUdp(String dnsIp, String domainName,
-                                               RequestType requestType) throws DnsException;
+                                               DnsRecordType dnsRecordType) throws DnsException;
 }

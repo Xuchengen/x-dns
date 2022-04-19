@@ -3,8 +3,8 @@ package com.github.xuchengen.xdns.test;
 import cn.hutool.json.JSONUtil;
 import com.github.xuchengen.xdns.exception.DnsException;
 import com.github.xuchengen.xdns.resolver.DnsResolver;
-import com.github.xuchengen.xdns.resolver.RequestType;
 import com.github.xuchengen.xdns.result.DnsResult;
+import io.netty.handler.codec.dns.DnsRecordType;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;
@@ -39,11 +39,11 @@ public class DnsResolverTest extends BaseTest {
             }
 
             CompletableFuture<Void> completableFuture = CompletableFuture.supplyAsync(() ->
-                            dnsResolver.resolveDomainByTcp("8.8.8.218", domainName, RequestType.REQUEST_A))
+                            dnsResolver.resolveDomainByTcp("223.5.5.5", domainName, DnsRecordType.A))
                     .exceptionally(throwable ->
                     {
                         System.out.println("exceptionally : " + throwable.getMessage());
-                        return new DnsResult(DnsResult.Type.A, domainName, Collections.emptyList());
+                        return new DnsResult(DnsRecordType.A, domainName, Collections.emptyList());
                     })
                     .thenAccept(e -> System.out.println("这是什么：" + JSONUtil.toJsonStr(e)));
 
@@ -71,7 +71,7 @@ public class DnsResolverTest extends BaseTest {
                 domainName = "kakao.com";
             }
 
-            DnsResult result = dnsResolver.resolveDomainByUdp("223.5.5.5", domainName, RequestType.REQUEST_A);
+            DnsResult result = dnsResolver.resolveDomainByUdp("223.5.5.5", domainName, DnsRecordType.A);
             System.out.println(JSONUtil.toJsonStr(result.getRecords()));
         }
     }

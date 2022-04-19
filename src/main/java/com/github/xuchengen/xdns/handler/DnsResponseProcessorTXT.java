@@ -33,7 +33,7 @@ public class DnsResponseProcessorTXT implements DnsResponseProcessor {
             message = String.format("TXT handler exception caught, %s", throwable.getMessage());
         }
         String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
-        DnsResult dnsResult = new DnsResult(DnsResult.Type.TXT, domainName, Collections.emptyList());
+        DnsResult dnsResult = new DnsResult(DnsRecordType.TXT, domainName, Collections.emptyList());
         ctx.channel().attr(DnsResponseHandler.RESULT).set(dnsResult);
         ctx.channel().attr(DnsResponseHandler.ERROR).set(message);
         ctx.close();
@@ -70,7 +70,7 @@ public class DnsResponseProcessorTXT implements DnsResponseProcessor {
                 }
             }
 
-            DnsResult txtResult = new DnsResult(DnsResult.Type.TXT, domainName, results);
+            DnsResult txtResult = new DnsResult(DnsRecordType.TXT, domainName, results);
             channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(txtResult);
         }
 

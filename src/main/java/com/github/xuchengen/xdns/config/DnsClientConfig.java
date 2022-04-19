@@ -31,7 +31,7 @@ public class DnsClientConfig {
 
     @Bean
     @Lazy
-    public Bootstrap dnsTcpClientBootStrap(DnsResponseProcessorFactory factory) {
+    public Bootstrap dnsTcpClientBootStrap(DnsResponseHandler dnsResponseHandler) {
         return new Bootstrap()
                 .group(eventLoopGroupWithClient())
                 .channel(NioSocketChannel.class)
@@ -44,14 +44,14 @@ public class DnsClientConfig {
                                 .addLast(new WriteTimeoutHandler(10))
                                 .addLast(new TcpDnsQueryEncoder())
                                 .addLast(new TcpDnsResponseDecoder())
-                                .addLast(new DnsResponseHandler(factory));
+                                .addLast(dnsResponseHandler);
                     }
                 });
     }
 
     @Bean
     @Lazy
-    public Bootstrap dnsUdpClientBootstrap(DnsResponseProcessorFactory factory) {
+    public Bootstrap dnsUdpClientBootstrap(DnsResponseHandler dnsResponseHandler) {
         return new Bootstrap()
                 .group(eventLoopGroupWithClient())
                 .channel(NioDatagramChannel.class)
@@ -63,7 +63,7 @@ public class DnsClientConfig {
                                 .addLast(new WriteTimeoutHandler(10))
                                 .addLast(new DatagramDnsQueryEncoder())
                                 .addLast(new DatagramDnsResponseDecoder())
-                                .addLast(new DnsResponseHandler(factory));
+                                .addLast(dnsResponseHandler);
                     }
                 });
     }

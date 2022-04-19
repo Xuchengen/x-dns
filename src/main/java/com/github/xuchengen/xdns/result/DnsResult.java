@@ -1,5 +1,7 @@
 package com.github.xuchengen.xdns.result;
 
+import io.netty.handler.codec.dns.DnsRecordType;
+
 import java.util.List;
 
 /**
@@ -10,21 +12,19 @@ import java.util.List;
  */
 public class DnsResult {
 
-    public enum Type {A, TXT, NS, MX}
-
-    private final Type type;
+    private final DnsRecordType type;
 
     private final String domain;
 
     private final List<String> records;
 
-    public DnsResult(Type type, String domain, List<String> records) {
+    public DnsResult(DnsRecordType type, String domain, List<String> records) {
         this.type = type;
         this.domain = domain;
         this.records = records;
     }
 
-    public Type getType() {
+    public DnsRecordType getType() {
         return type;
     }
 
