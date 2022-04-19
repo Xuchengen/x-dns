@@ -10,7 +10,10 @@ import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.dns.*;
+import io.netty.handler.codec.dns.DatagramDnsQueryEncoder;
+import io.netty.handler.codec.dns.DatagramDnsResponseDecoder;
+import io.netty.handler.codec.dns.TcpDnsQueryEncoder;
+import io.netty.handler.codec.dns.TcpDnsResponseDecoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +44,7 @@ public class DnsClientConfig {
                                 .addLast(new WriteTimeoutHandler(10))
                                 .addLast(new TcpDnsQueryEncoder())
                                 .addLast(new TcpDnsResponseDecoder())
-                                .addLast(new DnsResponseHandler<DnsResponse>(DefaultDnsResponse.class, factory));
+                                .addLast(new DnsResponseHandler(factory));
                     }
                 });
     }
@@ -60,7 +63,7 @@ public class DnsClientConfig {
                                 .addLast(new WriteTimeoutHandler(10))
                                 .addLast(new DatagramDnsQueryEncoder())
                                 .addLast(new DatagramDnsResponseDecoder())
-                                .addLast(new DnsResponseHandler<DnsResponse>(DatagramDnsResponse.class, factory));
+                                .addLast(new DnsResponseHandler(factory));
                     }
                 });
     }

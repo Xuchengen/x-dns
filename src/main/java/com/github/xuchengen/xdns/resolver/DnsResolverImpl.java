@@ -41,8 +41,8 @@ public class DnsResolverImpl implements DnsResolver {
         final Channel ch;
         try {
             ch = dnsTcpClientBootstrap.connect(dnsIp, 53).sync().channel();
-        } catch (Throwable cte) {
-            throw new DnsException(String.format("fail to connect dns server, %s", cte.getMessage()));
+        } catch (Throwable throwable) {
+            throw new DnsException(String.format("fail to connect dns server, %s", throwable.getMessage()));
         }
 
         DnsQuery query = new DefaultDnsQuery(randomID, DnsOpCode.QUERY)

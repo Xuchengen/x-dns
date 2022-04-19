@@ -24,14 +24,14 @@ import java.util.List;
 @Component(value = "dnsResponseProcessorA")
 public class DnsResponseProcessorA implements DnsResponseProcessor {
 
-    public void doError(ChannelHandlerContext ctx, Throwable cause) {
+    public void doError(ChannelHandlerContext ctx, Throwable throwable) {
         String message;
-        if (cause instanceof ReadTimeoutException) {
+        if (throwable instanceof ReadTimeoutException) {
             message = "A handler read timed out";
-        } else if (cause instanceof WriteTimeoutException) {
+        } else if (throwable instanceof WriteTimeoutException) {
             message = "A handler write timed out";
         } else {
-            message = String.format("A handler exception caught, %s", cause.getMessage());
+            message = String.format("A handler exception caught, %s", throwable.getMessage());
         }
         String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
         DnsResult dnsResult = new DnsResult(DnsResult.Type.A, domainName, Collections.emptyList());

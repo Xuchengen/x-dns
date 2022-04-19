@@ -22,14 +22,14 @@ import java.util.List;
 @Component(value = "dnsResponseProcessorNS")
 public class DnsResponseProcessorNS implements DnsResponseProcessor {
 
-    public void doError(ChannelHandlerContext ctx, Throwable cause) {
+    public void doError(ChannelHandlerContext ctx, Throwable throwable) {
         String message;
-        if (cause instanceof ReadTimeoutException) {
+        if (throwable instanceof ReadTimeoutException) {
             message = "NS handler read timed out";
-        } else if (cause instanceof WriteTimeoutException) {
+        } else if (throwable instanceof WriteTimeoutException) {
             message = "NS handler write timed out";
         } else {
-            message = String.format("NS handler exception caught, %s", cause.getMessage());
+            message = String.format("NS handler exception caught, %s", throwable.getMessage());
         }
         String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
         DnsResult dnsResult = new DnsResult(DnsResult.Type.NS, domainName, Collections.emptyList());

@@ -14,7 +14,7 @@ import io.netty.util.AttributeKey;
  * 邮箱：xuchengen@gmail.com<br>
  * 2022-04-18 11:55
  */
-public class DnsResponseHandler<T extends DnsResponse> extends SimpleChannelInboundHandler<T> {
+public class DnsResponseHandler extends SimpleChannelInboundHandler<DnsResponse> {
 
     public final static AttributeKey<DnsResult> RESULT = AttributeKey.valueOf("RESULT");
 
@@ -26,8 +26,7 @@ public class DnsResponseHandler<T extends DnsResponse> extends SimpleChannelInbo
 
     private final DnsResponseProcessorFactory factory;
 
-    public DnsResponseHandler(Class<? extends T> clazz, DnsResponseProcessorFactory factory) {
-        super(clazz);
+    public DnsResponseHandler(DnsResponseProcessorFactory factory) {
         this.factory = factory;
     }
 

@@ -11,7 +11,7 @@ import io.netty.handler.codec.dns.DnsResponse;
  */
 public interface DnsResponseProcessor {
 
-    void doError(ChannelHandlerContext ctx, Throwable cause);
+    void doError(ChannelHandlerContext ctx, Throwable throwable);
 
     void doProcess(ChannelHandlerContext channelHandlerContext, DnsResponse dnsResponse);
 }
