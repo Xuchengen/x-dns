@@ -21,7 +21,7 @@ import java.util.List;
  * 邮箱：xuchengen@gmail.com<br>
  * 2022-04-15 15:00
  */
-@Component(value = "dnsResponseProcessorNS")
+@Component
 @DnsQuestionType(type = "NS")
 public class DnsResponseProcessorNS implements DnsResponseProcessor {
 

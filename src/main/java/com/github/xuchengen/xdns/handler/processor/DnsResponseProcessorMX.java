@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * 邮箱：xuchengen@gmail.com<br>
  * 2022-04-15 14:54
  */
-@Component(value = "dnsResponseProcessorMX")
+@Component
 @DnsQuestionType(type = "MX")
 public class DnsResponseProcessorMX implements DnsResponseProcessor {
 

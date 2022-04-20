@@ -22,7 +22,7 @@ import java.util.List;
  * 邮箱：xuchengen@gmail.com<br>
  * 2022-04-15 15:05
  */
-@Component(value = "dnsResponseProcessorTXT")
+@Component
 @DnsQuestionType(type = "TXT")
 public class DnsResponseProcessorTXT implements DnsResponseProcessor {
 
