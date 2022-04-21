@@ -2,7 +2,6 @@ package com.github.xuchengen.xdns.handler.processor;
 
 import cn.hutool.core.util.StrUtil;
 import com.github.xuchengen.xdns.annotation.DnsQuestionType;
-import com.github.xuchengen.xdns.exception.DnsException;
 import com.github.xuchengen.xdns.handler.DnsResponseHandler;
 import com.github.xuchengen.xdns.result.DnsResult;
 import io.netty.channel.ChannelHandlerContext;
@@ -51,23 +50,18 @@ public class DnsResponseProcessorPTR implements DnsResponseProcessor {
         }
 
         int count = dnsResponse.count(DnsSection.ANSWER);
+        List<String> results = Collections.emptyList();
 
-        if (count == 0) {
-            throw new DnsException(dnsResponse.code().toString());
-        } else {
-            List<String> results = new ArrayList<>();
+        if (count > 0) {
+            results = new ArrayList<>();
             for (int i = 0; i < count; i++) {
-                DnsRecord record = dnsResponse.recordAt(DnsSection.ANSWER, i);
-                if (DnsRecordType.PTR.equals(record.type())) {
-                    DnsRawRecord raw = (DnsRawRecord) record;
-                    results.add(raw.content().toString());
-                }
+                DefaultDnsPtrRecord record = dnsResponse.recordAt(DnsSection.ANSWER, i);
+                results.add(record.hostname());
             }
-
-            DnsResult result = new DnsResult(DnsRecordType.PTR, domainName, results);
-            channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(result);
         }
 
+        DnsResult<String> result = new DnsResult<>(DnsRecordType.PTR, domainName, results);
+        channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(result);
         channelHandlerContext.close();
     }
 }

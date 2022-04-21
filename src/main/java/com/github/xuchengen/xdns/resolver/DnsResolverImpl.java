@@ -1,5 +1,6 @@
 package com.github.xuchengen.xdns.resolver;
 
+import cn.hutool.core.util.StrUtil;
 import com.github.xuchengen.xdns.exception.DnsException;
 import com.github.xuchengen.xdns.handler.DnsResponseHandler;
 import com.github.xuchengen.xdns.result.DnsResult;
@@ -71,9 +72,10 @@ public class DnsResolverImpl implements DnsResolver {
             throw new DnsException("fail to resolve record, interrupted exception");
         }
 
-        DnsResult<?> result = ch.attr(DnsResponseHandler.RESULT).get();
-        if (result.getRecords().isEmpty()) {
-            throw new DnsException(ch.attr(DnsResponseHandler.ERROR).get());
+        DnsResult<?> result = ch.attr(DnsResponseHandler.RESULT).getAndSet(null);
+        String errorMsg = ch.attr(DnsResponseHandler.ERROR).getAndSet(null);
+        if (StrUtil.isNotBlank(errorMsg)) {
+            throw new DnsException(errorMsg);
         }
 
         return result;
@@ -120,9 +122,10 @@ public class DnsResolverImpl implements DnsResolver {
             throw new DnsException("fail to resolve record, interrupted exception");
         }
 
-        DnsResult<?> result = ch.attr(DnsResponseHandler.RESULT).get();
-        if (result.getRecords().isEmpty()) {
-            throw new DnsException(ch.attr(DnsResponseHandler.ERROR).get());
+        DnsResult<?> result = ch.attr(DnsResponseHandler.RESULT).getAndSet(null);
+        String errorMsg = ch.attr(DnsResponseHandler.ERROR).getAndSet(null);
+        if (StrUtil.isNotBlank(errorMsg)) {
+            throw new DnsException(errorMsg);
         }
 
         return result;
