@@ -14,21 +14,17 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * DNS PTR记录请求处理器<br>
+ * DNS NS记录请求处理器<br>
  * 作者：徐承恩<br>
  * 邮箱：xuchengen@gmail.com<br>
- * 2022-04-20 14:22
+ * 2022-04-21 14:13
  */
 @Component
-@DnsQuestionType(type = "PTR")
-public class DnsRequestProcessorPTR implements DnsRequestProcessor {
+@DnsQuestionType(type = "NS")
+public class DnsRequestProcessorNS implements DnsRequestProcessor {
 
     @Resource(name = "dnsResolver")
     private DnsResolver dnsResolver;
-
-    private static final String IPV6_LOOKBACK = "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa.";
-
-    private static final String IPV4_LOOKBACK = "1.0.0.127.in-addr.arpa.";
 
     @Override
     public void doProcess(ChannelHandlerContext ctx, DnsQuery query) {
@@ -44,20 +40,13 @@ public class DnsRequestProcessorPTR implements DnsRequestProcessor {
         DnsRecordType type = question.type();
         String name = question.name();
         response.addRecord(DnsSection.QUESTION, question);
-        if (IPV4_LOOKBACK.equals(name) || IPV6_LOOKBACK.equals(name)) {
+        DnsResult result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
+        List<String> records = result.getRecords();
+        for (String record : records) {
             ByteBuf buffer = Unpooled.buffer();
-            DnsCodecUtil.encodeDomainName("xuchengen.cn", buffer);
-            DefaultDnsRawRecord record = new DefaultDnsRawRecord(name, type, 10, buffer);
-            response.addRecord(DnsSection.ANSWER, record);
-        } else {
-            DnsResult result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
-            List<String> records = result.getRecords();
-            for (String record : records) {
-                ByteBuf buffer = Unpooled.buffer();
-                DnsCodecUtil.encodeDomainName(record, buffer);
-                DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, buffer);
-                response.addRecord(DnsSection.ANSWER, rawRecord);
-            }
+            DnsCodecUtil.encodeDomainName(record, buffer);
+            DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, buffer);
+            response.addRecord(DnsSection.ANSWER, rawRecord);
         }
         ctx.writeAndFlush(response);
     }
