@@ -42,7 +42,9 @@ public class DnsRequestProcessorTXT implements DnsRequestProcessor {
         DnsResult<String> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
         List<String> records = result.getRecords();
         for (String record : records) {
-            ByteBuf buffer = Unpooled.copiedBuffer(record.getBytes());
+            ByteBuf buffer = Unpooled.buffer();
+            buffer.writeByte(record.length());
+            buffer.writeBytes(record.getBytes());
             DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, buffer);
             response.addRecord(DnsSection.ANSWER, rawRecord);
         }
