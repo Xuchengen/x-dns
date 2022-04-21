@@ -10,15 +10,15 @@ import java.util.List;
  * 邮箱：xuchengen@gmail.com<br>
  * 2022-04-15 14:31
  */
-public class DnsResult {
+public class DnsResult<T> {
 
     private final DnsRecordType type;
 
     private final String domain;
 
-    private final List<String> records;
+    private final List<T> records;
 
-    public DnsResult(DnsRecordType type, String domain, List<String> records) {
+    public DnsResult(DnsRecordType type, String domain, List<T> records) {
         this.type = type;
         this.domain = domain;
         this.records = records;
@@ -32,7 +32,7 @@ public class DnsResult {
         return domain;
     }
 
-    public List<String> getRecords() {
+    public List<T> getRecords() {
         return records;
     }
 }

@@ -71,7 +71,7 @@ public class DnsResolverImpl implements DnsResolver {
             throw new DnsException("fail to resolve record, interrupted exception");
         }
 
-        DnsResult result = ch.attr(DnsResponseHandler.RESULT).get();
+        DnsResult<?> result = ch.attr(DnsResponseHandler.RESULT).get();
         if (result.getRecords().isEmpty()) {
             throw new DnsException(ch.attr(DnsResponseHandler.ERROR).get());
         }
@@ -120,7 +120,7 @@ public class DnsResolverImpl implements DnsResolver {
             throw new DnsException("fail to resolve record, interrupted exception");
         }
 
-        DnsResult result = ch.attr(DnsResponseHandler.RESULT).get();
+        DnsResult<?> result = ch.attr(DnsResponseHandler.RESULT).get();
         if (result.getRecords().isEmpty()) {
             throw new DnsException(ch.attr(DnsResponseHandler.ERROR).get());
         }

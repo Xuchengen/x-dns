@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @ChannelHandler.Sharable
 public class DnsResponseHandler extends SimpleChannelInboundHandler<DnsResponse> {
 
-    public final static AttributeKey<DnsResult> RESULT = AttributeKey.valueOf("RESULT");
+    public final static AttributeKey<DnsResult<?>> RESULT = AttributeKey.valueOf("RESULT");
 
     public final static AttributeKey<String> ERROR = AttributeKey.valueOf("ERROR");
 

@@ -18,9 +18,9 @@ public interface DnsResolver {
         return (short) new Random().nextInt(1 << 15);
     }
 
-    <T extends DnsResult> T resolveDomainByTcp(String dnsIp, String domainName,
-                                               DnsRecordType dnsRecordType) throws DnsException;
+    <T extends DnsResult<?>> T resolveDomainByTcp(String dnsIp, String domainName,
+                                                  DnsRecordType dnsRecordType) throws DnsException;
 
-    <T extends DnsResult> T resolveDomainByUdp(String dnsIp, String domainName,
-                                               DnsRecordType dnsRecordType) throws DnsException;
+    <T extends DnsResult<?>> T resolveDomainByUdp(String dnsIp, String domainName,
+                                                  DnsRecordType dnsRecordType) throws DnsException;
 }

@@ -36,7 +36,7 @@ public class DnsResponseProcessorPTR implements DnsResponseProcessor {
             message = String.format("PTR handler exception caught, %s", throwable.getMessage());
         }
         String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
-        DnsResult dnsResult = new DnsResult(DnsRecordType.PTR, domainName, Collections.emptyList());
+        DnsResult<String> dnsResult = new DnsResult<>(DnsRecordType.PTR, domainName, Collections.emptyList());
         ctx.channel().attr(DnsResponseHandler.RESULT).set(dnsResult);
         ctx.channel().attr(DnsResponseHandler.ERROR).set(message);
         ctx.close();

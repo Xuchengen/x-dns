@@ -63,7 +63,7 @@ public class DnsResponseProcessorNS implements DnsResponseProcessor {
                 }
             }
 
-            DnsResult nsResult = new DnsResult(DnsRecordType.NS, domainName, results);
+            DnsResult<String> nsResult = new DnsResult<>(DnsRecordType.NS, domainName, results);
             channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(nsResult);
         }
 

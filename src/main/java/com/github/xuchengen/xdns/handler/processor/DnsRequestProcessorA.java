@@ -48,7 +48,7 @@ public class DnsRequestProcessorA implements DnsRequestProcessor {
             DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, byteBuf);
             response.addRecord(DnsSection.ANSWER, rawRecord);
         } else {
-            DnsResult result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
+            DnsResult<String> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
             List<String> records = result.getRecords();
             for (String record : records) {
                 ByteBuf byteBuf = Unpooled.wrappedBuffer(NetUtil.createByteArrayFromIpAddressString(record));

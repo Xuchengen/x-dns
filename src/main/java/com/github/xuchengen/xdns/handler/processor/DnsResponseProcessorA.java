@@ -64,7 +64,7 @@ public class DnsResponseProcessorA implements DnsResponseProcessor {
                 }
             }
 
-            DnsResult result = new DnsResult(DnsRecordType.A, domainName, results);
+            DnsResult<String> result = new DnsResult<>(DnsRecordType.A, domainName, results);
             channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(result);
         }
 

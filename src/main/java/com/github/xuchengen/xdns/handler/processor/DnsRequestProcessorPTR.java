@@ -50,7 +50,7 @@ public class DnsRequestProcessorPTR implements DnsRequestProcessor {
             DefaultDnsRawRecord record = new DefaultDnsRawRecord(name, type, 10, buffer);
             response.addRecord(DnsSection.ANSWER, record);
         } else {
-            DnsResult result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
+            DnsResult<String> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
             List<String> records = result.getRecords();
             for (String record : records) {
                 ByteBuf buffer = Unpooled.buffer();
