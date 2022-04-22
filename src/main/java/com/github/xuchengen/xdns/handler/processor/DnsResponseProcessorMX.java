@@ -2,7 +2,6 @@ package com.github.xuchengen.xdns.handler.processor;
 
 import cn.hutool.core.util.StrUtil;
 import com.github.xuchengen.xdns.annotation.DnsQuestionType;
-import com.github.xuchengen.xdns.exception.DnsException;
 import com.github.xuchengen.xdns.handler.DnsResponseHandler;
 import com.github.xuchengen.xdns.result.DnsResult;
 import com.github.xuchengen.xdns.result.DnsResultMX;
@@ -50,36 +49,31 @@ public class DnsResponseProcessorMX implements DnsResponseProcessor {
         }
 
         int count = dnsResponse.count(DnsSection.ANSWER);
+        List<DnsResultMX> results = Collections.emptyList();
 
-        if (count == 0) {
-            throw new DnsException(dnsResponse.code().toString());
-        } else {
+        if (count > 0) {
             Comparator<Integer> comparator = Comparator.comparingInt(i -> i);
             Map<Integer, List<DnsResultMX>> map = new TreeMap<>(comparator);
-            List<DnsResultMX> results;
             for (int i = 0; i < count; i++) {
-                DnsRecord mxrecord = dnsResponse.recordAt(DnsSection.ANSWER, i);
-                if (mxrecord.type() == DnsRecordType.MX) {
-                    DnsRawRecord raw = (DnsRawRecord) mxrecord;
-                    ByteBuf content = raw.content();
-                    Integer preference = content.readUnsignedShort();
-                    String record = DefaultDnsRecordDecoder.decodeName(content);
-                    DnsResultMX dnsResultMX = new DnsResultMX(preference, record);
-                    if (map.containsKey(preference)) {
-                        map.get(preference).add(dnsResultMX);
-                    } else {
-                        List<DnsResultMX> list = new ArrayList<>();
-                        list.add(dnsResultMX);
-                        map.put(preference, list);
-                    }
+                DefaultDnsRawRecord rawRecord = dnsResponse.recordAt(DnsSection.ANSWER, i);
+                ByteBuf content = rawRecord.content();
+                Integer preference = content.readUnsignedShort();
+                String record = DefaultDnsRecordDecoder.decodeName(content);
+                DnsResultMX dnsResultMX = new DnsResultMX(preference, record);
+                if (map.containsKey(preference)) {
+                    map.get(preference).add(dnsResultMX);
+                } else {
+                    List<DnsResultMX> list = new ArrayList<>();
+                    list.add(dnsResultMX);
+                    map.put(preference, list);
                 }
             }
 
             results = map.entrySet().stream().flatMap(entry -> entry.getValue().stream()).collect(Collectors.toList());
-            DnsResult<DnsResultMX> mxResult = new DnsResult<>(DnsRecordType.MX, domainName, results);
-            channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(mxResult);
         }
 
+        DnsResult<DnsResultMX> mxResult = new DnsResult<>(DnsRecordType.MX, domainName, results);
+        channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(mxResult);
         channelHandlerContext.close();
     }
 }
