@@ -34,7 +34,7 @@ public class DnsResponseProcessorNS implements DnsResponseProcessor {
             message = String.format("NS handler exception caught, %s", throwable.getMessage());
         }
         String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
-        DnsResult dnsResult = new DnsResult(DnsRecordType.NS, domainName, Collections.emptyList());
+        DnsResult<String> dnsResult = new DnsResult<>(DnsRecordType.NS, domainName, Collections.emptyList());
         ctx.channel().attr(DnsResponseHandler.RESULT).set(dnsResult);
         ctx.channel().attr(DnsResponseHandler.ERROR).set(message);
         ctx.close();

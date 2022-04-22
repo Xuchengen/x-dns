@@ -4,10 +4,12 @@ import com.github.xuchengen.xdns.annotation.DnsQuestionType;
 import com.github.xuchengen.xdns.resolver.DnsResolver;
 import com.github.xuchengen.xdns.result.DnsResult;
 import com.github.xuchengen.xdns.utils.DnsCodecUtil;
+import com.github.xuchengen.xdns.utils.DomainUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.dns.*;
+import io.netty.util.NetUtil;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -26,10 +28,6 @@ public class DnsRequestProcessorPTR implements DnsRequestProcessor {
     @Resource(name = "dnsResolver")
     private DnsResolver dnsResolver;
 
-    private static final String IPV6_LOOKBACK = "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa.";
-
-    private static final String IPV4_LOOKBACK = "1.0.0.127.in-addr.arpa.";
-
     @Override
     public void doProcess(ChannelHandlerContext ctx, DnsQuery query) {
         DnsResponse response;
@@ -42,13 +40,28 @@ public class DnsRequestProcessorPTR implements DnsRequestProcessor {
 
         DefaultDnsQuestion question = query.recordAt(DnsSection.QUESTION);
         DnsRecordType type = question.type();
-        String name = question.name();
         response.addRecord(DnsSection.QUESTION, question);
-        if (IPV4_LOOKBACK.equals(name) || IPV6_LOOKBACK.equals(name)) {
-            ByteBuf buffer = Unpooled.buffer();
-            DnsCodecUtil.encodeDomainName("xuchengen.cn", buffer);
+        String name = question.name();
+
+        if (DomainUtil.isNotPtrArpa(name) && !DomainUtil.DOMAIN_VALIDATOR.isValid(name)) {
+            // 如果不是ptr arpa且又不是域名
+            System.out.println("不是PTR ARPA 且又不是域名");
+            response.setCode(DnsResponseCode.NXDOMAIN);
+            ctx.writeAndFlush(response);
+            return;
+        } else if (DomainUtil.isNotPtrArpa(name) && DomainUtil.DOMAIN_VALIDATOR.isValid(name)) {
+            // 如果是域名返回空结果
+            System.out.println("不是PTR ARPA 且是域名");
+            ctx.writeAndFlush(response);
+            return;
+        } else if (DomainUtil.IPV4_ARPA.equals(name) || DomainUtil.IPV6_ARPA.equals(name)) {
+            // 如果是 127.0.0.1 ::1 PTR返回localhost
+            System.out.println("是本地IP");
+            ByteBuf buffer = Unpooled.wrappedBuffer(NetUtil.LOCALHOST.getAddress());
             DefaultDnsRawRecord record = new DefaultDnsRawRecord(name, type, 10, buffer);
             response.addRecord(DnsSection.ANSWER, record);
+            ctx.writeAndFlush(response);
+            return;
         } else {
             DnsResult<String> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
             List<String> records = result.getRecords();

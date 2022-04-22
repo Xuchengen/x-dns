@@ -17,26 +17,26 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * DNS A记录响应处理器<br>
+ * DNS AAAA记录响应处理器<br>
  * 作者：徐承恩<br>
  * 邮箱：xuchengen@gmail.com<br>
  * 2022-04-15 14:40
  */
 @Component
-@DnsQuestionType(type = "A")
-public class DnsResponseProcessorA implements DnsResponseProcessor {
+@DnsQuestionType(type = "AAAA")
+public class DnsResponseProcessorAAAA implements DnsResponseProcessor {
 
     public void doError(ChannelHandlerContext ctx, Throwable throwable) {
         String message;
         if (throwable instanceof ReadTimeoutException) {
-            message = "A handler read timed out";
+            message = "AAAA handler read timed out";
         } else if (throwable instanceof WriteTimeoutException) {
-            message = "A handler write timed out";
+            message = "AAAA handler write timed out";
         } else {
-            message = String.format("A handler exception caught, %s", throwable.getMessage());
+            message = String.format("AAAA handler exception caught, %s", throwable.getMessage());
         }
         String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
-        DnsResult<String> dnsResult = new DnsResult<>(DnsRecordType.A, domainName, Collections.emptyList());
+        DnsResult<String> dnsResult = new DnsResult<>(DnsRecordType.AAAA, domainName, Collections.emptyList());
         ctx.channel().attr(DnsResponseHandler.RESULT).set(dnsResult);
         ctx.channel().attr(DnsResponseHandler.ERROR).set(message);
         ctx.close();
@@ -60,7 +60,7 @@ public class DnsResponseProcessorA implements DnsResponseProcessor {
             }
         }
 
-        DnsResult<String> result = new DnsResult<>(DnsRecordType.A, domainName, results);
+        DnsResult<String> result = new DnsResult<>(DnsRecordType.AAAA, domainName, results);
         channelHandlerContext.channel().attr(DnsResponseHandler.RESULT).set(result);
         channelHandlerContext.close();
     }

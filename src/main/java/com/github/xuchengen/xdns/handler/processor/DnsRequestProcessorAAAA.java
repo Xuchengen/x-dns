@@ -15,14 +15,14 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * DNS A记录请求处理器<br>
+ * DNS AAAA记录请求处理器<br>
  * 作者：徐承恩<br>
  * 邮箱：xuchengen@gmail.com<br>
  * 2022-04-20 13:58
  */
 @Component
-@DnsQuestionType(type = "A")
-public class DnsRequestProcessorA implements DnsRequestProcessor {
+@DnsQuestionType(type = "AAAA")
+public class DnsRequestProcessorAAAA implements DnsRequestProcessor {
 
     @Resource(name = "dnsResolver")
     private DnsResolver dnsResolver;
@@ -42,8 +42,8 @@ public class DnsRequestProcessorA implements DnsRequestProcessor {
         String name = question.name();
 
         if (DomainUtil.DOMAIN_LOCALHOST.equals(name)) {
-            // 如果是 localhost. A记录返回127.0.0.1
-            ByteBuf byteBuf = Unpooled.wrappedBuffer(NetUtil.LOCALHOST4.getAddress());
+            // 如果是 localhost. AAAA记录返回::1
+            ByteBuf byteBuf = Unpooled.wrappedBuffer(NetUtil.LOCALHOST6.getAddress());
             DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, byteBuf);
             response.addRecord(DnsSection.ANSWER, rawRecord);
         } else if (DomainUtil.DOMAIN_VALIDATOR.isValid(name)) {

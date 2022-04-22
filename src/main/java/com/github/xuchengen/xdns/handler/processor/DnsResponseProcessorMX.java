@@ -35,7 +35,7 @@ public class DnsResponseProcessorMX implements DnsResponseProcessor {
             message = String.format("MX handler exception caught, %s", throwable.getMessage());
         }
         String domainName = ctx.channel().attr(DnsResponseHandler.DOMAIN_NAME).get();
-        DnsResult dnsResult = new DnsResult(DnsRecordType.MX, domainName, Collections.emptyList());
+        DnsResult<DnsResultMX> dnsResult = new DnsResult<>(DnsRecordType.MX, domainName, Collections.emptyList());
         ctx.channel().attr(DnsResponseHandler.RESULT).set(dnsResult);
         ctx.channel().attr(DnsResponseHandler.ERROR).set(message);
         ctx.close();
