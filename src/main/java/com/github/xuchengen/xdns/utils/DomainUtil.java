@@ -1,7 +1,6 @@
 package com.github.xuchengen.xdns.utils;
 
 import cn.hutool.core.util.StrUtil;
-import org.apache.commons.validator.routines.DomainValidator;
 
 /**
  * 域工具类<br>
@@ -10,8 +9,6 @@ import org.apache.commons.validator.routines.DomainValidator;
  * 2022-04-22 14:17
  */
 public class DomainUtil {
-
-    public static final DomainValidator DOMAIN_VALIDATOR = DomainValidator.getInstance();
 
     public static final String DOMAIN_LOCALHOST = "localhost.";
 

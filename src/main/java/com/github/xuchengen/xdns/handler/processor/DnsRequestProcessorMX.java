@@ -6,6 +6,7 @@ import com.github.xuchengen.xdns.result.DnsResult;
 import com.github.xuchengen.xdns.result.DnsResultMX;
 import com.github.xuchengen.xdns.utils.DnsCodecUtil;
 import com.github.xuchengen.xdns.utils.DomainUtil;
+import com.github.xuchengen.xdns.utils.DomainValidator;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -46,7 +47,7 @@ public class DnsRequestProcessorMX implements DnsRequestProcessor {
             // 如果是 localhost. MX记录返回空结果
             ctx.writeAndFlush(response);
             return;
-        } else if (DomainUtil.DOMAIN_VALIDATOR.isValid(name)) {
+        } else if (DomainValidator.isValid(name)) {
             DnsResult<DnsResultMX> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
             List<DnsResultMX> records = result.getRecords();
             for (DnsResultMX record : records) {

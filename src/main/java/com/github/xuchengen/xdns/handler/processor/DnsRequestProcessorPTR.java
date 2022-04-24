@@ -5,6 +5,7 @@ import com.github.xuchengen.xdns.resolver.DnsResolver;
 import com.github.xuchengen.xdns.result.DnsResult;
 import com.github.xuchengen.xdns.utils.DnsCodecUtil;
 import com.github.xuchengen.xdns.utils.DomainUtil;
+import com.github.xuchengen.xdns.utils.DomainValidator;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,13 +44,13 @@ public class DnsRequestProcessorPTR implements DnsRequestProcessor {
         response.addRecord(DnsSection.QUESTION, question);
         String name = question.name();
 
-        if (DomainUtil.isNotPtrArpa(name) && !DomainUtil.DOMAIN_VALIDATOR.isValid(name)) {
+        if (DomainUtil.isNotPtrArpa(name) && !DomainValidator.isValid(name)) {
             // 如果不是ptr arpa且又不是域名
             System.out.println("不是PTR ARPA 且又不是域名");
             response.setCode(DnsResponseCode.NXDOMAIN);
             ctx.writeAndFlush(response);
             return;
-        } else if (DomainUtil.isNotPtrArpa(name) && DomainUtil.DOMAIN_VALIDATOR.isValid(name)) {
+        } else if (DomainUtil.isNotPtrArpa(name) && DomainValidator.isValid(name)) {
             // 如果是域名返回空结果
             System.out.println("不是PTR ARPA 且是域名");
             ctx.writeAndFlush(response);

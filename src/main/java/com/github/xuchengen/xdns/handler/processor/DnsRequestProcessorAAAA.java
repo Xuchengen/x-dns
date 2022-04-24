@@ -4,6 +4,7 @@ import com.github.xuchengen.xdns.annotation.DnsQuestionType;
 import com.github.xuchengen.xdns.resolver.DnsResolver;
 import com.github.xuchengen.xdns.result.DnsResult;
 import com.github.xuchengen.xdns.utils.DomainUtil;
+import com.github.xuchengen.xdns.utils.DomainValidator;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -46,7 +47,7 @@ public class DnsRequestProcessorAAAA implements DnsRequestProcessor {
             ByteBuf byteBuf = Unpooled.wrappedBuffer(NetUtil.LOCALHOST6.getAddress());
             DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, byteBuf);
             response.addRecord(DnsSection.ANSWER, rawRecord);
-        } else if (DomainUtil.DOMAIN_VALIDATOR.isValid(name)) {
+        } else if (DomainValidator.isValid(name)) {
             DnsResult<String> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
             List<String> records = result.getRecords();
             for (String record : records) {
