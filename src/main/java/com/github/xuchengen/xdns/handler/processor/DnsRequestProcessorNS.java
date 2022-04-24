@@ -5,7 +5,6 @@ import com.github.xuchengen.xdns.resolver.DnsResolver;
 import com.github.xuchengen.xdns.result.DnsResult;
 import com.github.xuchengen.xdns.utils.DnsCodecUtil;
 import com.github.xuchengen.xdns.utils.DomainUtil;
-import com.github.xuchengen.xdns.utils.DomainValidator;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,12 +43,12 @@ public class DnsRequestProcessorNS implements DnsRequestProcessor {
         response.addRecord(DnsSection.QUESTION, question);
         String name = question.name();
 
-        if (DomainUtil.DOMAIN_LOCALHOST.equals(name)) {
+        if (DomainUtil.isLocalhost(name)) {
             // 如果是 localhost. NS记录返回localhost
             ByteBuf byteBuf = Unpooled.wrappedBuffer(NetUtil.LOCALHOST.getAddress());
             DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, byteBuf);
             response.addRecord(DnsSection.ANSWER, rawRecord);
-        } else if (DomainValidator.isValid(name)) {
+        } else if (DomainUtil.isValid(name)) {
             DnsResult<String> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
             List<String> records = result.getRecords();
             for (String record : records) {

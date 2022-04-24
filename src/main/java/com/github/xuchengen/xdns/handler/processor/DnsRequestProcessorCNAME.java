@@ -5,7 +5,6 @@ import com.github.xuchengen.xdns.resolver.DnsResolver;
 import com.github.xuchengen.xdns.result.DnsResult;
 import com.github.xuchengen.xdns.utils.DnsCodecUtil;
 import com.github.xuchengen.xdns.utils.DomainUtil;
-import com.github.xuchengen.xdns.utils.DomainValidator;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -42,8 +41,8 @@ public class DnsRequestProcessorCNAME implements DnsRequestProcessor {
         response.addRecord(DnsSection.QUESTION, question);
         String name = question.name();
 
-        if (DomainUtil.DOMAIN_LOCALHOST.equals(name) || !DomainValidator.isValid(name)) {
-            // 如果是 localhost. 或者不是域名那还查询个什么
+        if (!DomainUtil.isValid(name)) {
+            // 如果不是域名那还查询个什么
             response.setCode(DnsResponseCode.NXDOMAIN);
         } else {
             DnsResult<String> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);

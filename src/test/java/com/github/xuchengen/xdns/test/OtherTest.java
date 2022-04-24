@@ -1,5 +1,6 @@
 package com.github.xuchengen.xdns.test;
 
+import com.github.xuchengen.xdns.utils.DomainUtil;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -12,25 +13,7 @@ public class OtherTest {
 
     @Test
     public void t1() {
-        System.out.println("com is：" + DomainValidator.isValid("com"));
-        System.out.println(".com is：" + DomainValidator.isValid(".com"));
-        System.out.println("com. is：" + DomainValidator.isValid("com."));
-        System.out.println(".com. is：" + DomainValidator.isValid(".com."));
-
-        System.out.println("xuchengen.com is：" + DomainValidator.isValid("xuchengen.com"));
-        System.out.println(".xuchengen.com is：" + DomainValidator.isValid(".xuchengen.com"));
-        System.out.println("xuchengen.com. is：" + DomainValidator.isValid("xuchengen.com."));
-        System.out.println(".xuchengen.com. is：" + DomainValidator.isValid(".xuchengen.com."));
-
-        System.out.println("中国 is：" + DomainValidator.isValid("中国"));
-        System.out.println(".中国 is：" + DomainValidator.isValid(".中国"));
-        System.out.println("中国. is：" + DomainValidator.isValid("中国."));
-        System.out.println(".中国. is：" + DomainValidator.isValid(".中国."));
-
-        System.out.println("香港.中国 is：" + DomainValidator.isValid("香港.中国"));
-        System.out.println(".香港.中国 is：" + DomainValidator.isValid(".香港.中国"));
-        System.out.println("香港.中国. is：" + DomainValidator.isValid("香港.中国."));
-        System.out.println(".香港.中国. is：" + DomainValidator.isValid(".香港.中国."));
+        System.out.println(DomainUtil.cleanRoot("com........"));
     }
 
 }
