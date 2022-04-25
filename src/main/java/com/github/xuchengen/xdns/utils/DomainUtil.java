@@ -52,6 +52,17 @@ public class DomainUtil {
      * @return 布尔值
      */
     public static boolean isValid(String domain) {
+        return isValid(domain, true);
+    }
+
+    /**
+     * 验证域名
+     *
+     * @param domain     域名
+     * @param allowLocal 允许本地
+     * @return 布尔值
+     */
+    public static boolean isValid(String domain, boolean allowLocal) {
         if (StrUtil.isBlank(domain)) {
             return false;
         }
@@ -74,28 +85,32 @@ public class DomainUtil {
             domain = groups[0];
         }
 
-        // 这里仅验证顶级域名是否符合正则，严格来说还是要遵守IANA数据库
-        return isLocalhost(domain) || isArpa(domain) || isMatch(domain);
+        // 这里仅验证顶级域名是否符合正则，严格来说需要遵守IANA数据库
+        if (allowLocal) {
+            return isLocalhost(domain) || isArpa(domain) || isMatch(domain);
+        } else {
+            return isArpa(domain) || isMatch(domain);
+        }
     }
 
     /**
-     * 判断域名是PTR ARPA
+     * 判断域名是arpa
      *
      * @param domain 域名
      * @return 布尔值
      */
-    private static boolean isArpa(String domain) {
-        return StrUtil.endWithAny(cleanRoot(domain), ARPA_STR);
+    public static boolean isArpa(String domain) {
+        return StrUtil.equals(cleanRoot(domain), ARPA_STR);
     }
 
     /**
-     * 判断域名是Localhost
+     * 判断域名是localhost
      *
      * @param domain 域名
      * @return 布尔值
      */
     public static boolean isLocalhost(String domain) {
-        return StrUtil.endWithAny(cleanRoot(domain), LOCALHOST_STR);
+        return StrUtil.equals(cleanRoot(domain), LOCALHOST_STR);
     }
 
     /**

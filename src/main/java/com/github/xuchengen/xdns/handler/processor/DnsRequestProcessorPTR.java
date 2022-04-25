@@ -43,17 +43,21 @@ public class DnsRequestProcessorPTR implements DnsRequestProcessor {
         response.addRecord(DnsSection.QUESTION, question);
         String name = question.name();
 
-        if (!DomainUtil.isValid(name)) {
-            // 如果不是ptr arpa且又不是域名
+        if (DomainUtil.isLocalhost(name)) {
+            // 如果域名本身是Localhost返回空结果
+            ctx.writeAndFlush(response);
+            return;
+        }
+
+        if (!DomainUtil.isValid(name, false)) {
+            // 如果不是域名则返回没有这个域名错误
             response.setCode(DnsResponseCode.NXDOMAIN);
             ctx.writeAndFlush(response);
             return;
-        } else if (DomainUtil.isValid(name)) {
-            // 如果是域名返回空结果
-            ctx.writeAndFlush(response);
-            return;
-        } else if (DomainUtil.IPV4_ARPA.equals(name) || DomainUtil.IPV6_ARPA.equals(name)) {
-            // 如果是 127.0.0.1 ::1 PTR返回localhost
+        }
+
+        if (DomainUtil.IPV4_ARPA.equals(name) || DomainUtil.IPV6_ARPA.equals(name)) {
+            // 如果是 1.0.0.127.arpa/1.0.0~.arpa 返回localhost
             ByteBuf buffer = Unpooled.wrappedBuffer(NetUtil.LOCALHOST.getAddress());
             DefaultDnsRawRecord record = new DefaultDnsRawRecord(name, type, 10, buffer);
             response.addRecord(DnsSection.ANSWER, record);
