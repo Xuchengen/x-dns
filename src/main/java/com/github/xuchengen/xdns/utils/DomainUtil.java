@@ -89,7 +89,7 @@ public class DomainUtil {
         if (allowLocal) {
             return isLocalhost(domain) || isArpa(domain) || isMatch(domain);
         } else {
-            return isArpa(domain) || isMatch(domain);
+            return isMatch(domain);
         }
     }
 

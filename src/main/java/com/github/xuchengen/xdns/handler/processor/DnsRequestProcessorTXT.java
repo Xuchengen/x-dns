@@ -1,8 +1,10 @@
 package com.github.xuchengen.xdns.handler.processor;
 
+import cn.hutool.core.collection.CollUtil;
 import com.github.xuchengen.xdns.annotation.DnsQuestionType;
 import com.github.xuchengen.xdns.resolver.DnsResolver;
 import com.github.xuchengen.xdns.result.DnsResult;
+import com.github.xuchengen.xdns.utils.DomainUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -37,17 +39,31 @@ public class DnsRequestProcessorTXT implements DnsRequestProcessor {
 
         DefaultDnsQuestion question = query.recordAt(DnsSection.QUESTION);
         DnsRecordType type = question.type();
-        String name = question.name();
         response.addRecord(DnsSection.QUESTION, question);
-        DnsResult<String> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
-        List<String> records = result.getRecords();
-        for (String record : records) {
-            ByteBuf buffer = Unpooled.buffer();
-            buffer.writeByte(record.length());
-            buffer.writeBytes(record.getBytes());
-            DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, buffer);
-            response.addRecord(DnsSection.ANSWER, rawRecord);
+        String name = question.name();
+
+        if (DomainUtil.isLocalhost(name)) {
+            ctx.writeAndFlush(response);
+            return;
         }
+
+        if (DomainUtil.isValid(name)) {
+            DnsResult<String> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
+            List<String> records = result.getRecords();
+            if (CollUtil.isNotEmpty(records)) {
+                for (String record : records) {
+                    ByteBuf buffer = Unpooled.buffer();
+                    buffer.writeByte(record.length());
+                    buffer.writeBytes(record.getBytes());
+                    DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, buffer);
+                    response.addRecord(DnsSection.ANSWER, rawRecord);
+                }
+                ctx.writeAndFlush(response);
+                return;
+            }
+        }
+
+        response.setCode(DnsResponseCode.NXDOMAIN);
         ctx.writeAndFlush(response);
     }
 }

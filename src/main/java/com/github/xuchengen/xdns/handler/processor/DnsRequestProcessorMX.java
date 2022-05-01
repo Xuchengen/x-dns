@@ -1,5 +1,6 @@
 package com.github.xuchengen.xdns.handler.processor;
 
+import cn.hutool.core.collection.CollUtil;
 import com.github.xuchengen.xdns.annotation.DnsQuestionType;
 import com.github.xuchengen.xdns.resolver.DnsResolver;
 import com.github.xuchengen.xdns.result.DnsResult;
@@ -42,24 +43,29 @@ public class DnsRequestProcessorMX implements DnsRequestProcessor {
         DnsRecordType type = question.type();
         response.addRecord(DnsSection.QUESTION, question);
         String name = question.name();
+
         if (DomainUtil.isLocalhost(name)) {
-            // 如果是 localhost. MX记录返回空结果
             ctx.writeAndFlush(response);
             return;
-        } else if (DomainUtil.isValid(name)) {
+        }
+
+        if (DomainUtil.isValid(name)) {
             DnsResult<DnsResultMX> result = dnsResolver.resolveDomainByUdp("223.5.5.5", name, type);
             List<DnsResultMX> records = result.getRecords();
-            for (DnsResultMX record : records) {
-                ByteBuf buffer = Unpooled.buffer();
-                buffer.writeShort(record.getPreference());
-                DnsCodecUtil.encodeDomainName(record.getMailExchange(), buffer);
-                DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, buffer);
-                response.addRecord(DnsSection.ANSWER, rawRecord);
+            if (CollUtil.isNotEmpty(records)) {
+                for (DnsResultMX record : records) {
+                    ByteBuf buffer = Unpooled.buffer();
+                    buffer.writeShort(record.getPreference());
+                    DnsCodecUtil.encodeDomainName(record.getMailExchange(), buffer);
+                    DefaultDnsRawRecord rawRecord = new DefaultDnsRawRecord(question.name(), type, 10, buffer);
+                    response.addRecord(DnsSection.ANSWER, rawRecord);
+                }
+                ctx.writeAndFlush(response);
+                return;
             }
-        } else {
-            // 如果连域名都不是还查询个什么
-            response.setCode(DnsResponseCode.NXDOMAIN);
         }
+
+        response.setCode(DnsResponseCode.NXDOMAIN);
         ctx.writeAndFlush(response);
     }
 }
